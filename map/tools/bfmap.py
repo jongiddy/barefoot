@@ -85,6 +85,7 @@ def ways2bfmap(src_host, src_port, src_database, src_table, src_user, src_passwo
             exit(1)
 
     print("%s segments from %s ways inserted and finished." % (roadcount, rowcount))
+    print(mph_counts)
 
     tgt_con.commit()
     src_cur.close()
@@ -130,6 +131,14 @@ def is_oneway(tags):
         return False
 
 
+mph_counts = {
+    'mph_forward': 0,
+    'kph_forward': 0,
+    'mph_backward': 0,
+    'kph_backward': 0,
+}
+
+
 def maxspeed(tags):
     # maxspeed_forward = int(config[key][value][2])
     forward = "null"
@@ -137,18 +146,22 @@ def maxspeed(tags):
         try:
             if "mph" in tags["maxspeed"]:
                 forward = int(tags["maxspeed"].split(" ")[0]) * 1.609
+                mph_counts['mph_forward'] += 1
             else:
                 forward = int(tags["maxspeed"])
+                mph_counts['kph_forward'] += 1
         except:
-            pass
+            mph_counts[tags["maxspeed"]] = mph_counts.get(tags["maxspeed"], 0) + 1
     if ("maxspeed:forward" in tags.keys()):
         try:
             if "mph" in tags["maxspeed:forward"]:
                 forward = int(tags["maxspeed:forward"].split(" ")[0]) * 1.609
+                mph_counts['mph_forward'] += 1
             else:
                 forward = int(tags["maxspeed:forward"])
+                mph_counts['kph_forward'] += 1
         except:
-            pass
+            mph_counts[tags["maxspeed:forward"]] = mph_counts.get(tags["maxspeed:forward"], 0) + 1
 
     # maxspeed_backward = maxspeed_forward
     backward = "null"
@@ -156,18 +169,22 @@ def maxspeed(tags):
         try:
             if "mph" in tags["maxspeed"]:
                 backward = int(tags["maxspeed"].split(" ")[0]) * 1.609
+                mph_counts['mph_backward'] += 1
             else:
                 backward = int(tags["maxspeed"])
+                mph_counts['kph_backward'] += 1
         except:
-            pass
+            mph_counts[tags["maxspeed"]] = mph_counts.get(tags["maxspeed"], 0) + 1
     if ("maxspeed:backward" in tags.keys()):
         try:
             if "mph" in tags["maxspeed:backward"]:
                 backward = int(tags["maxspeed:backward"].split(" ")[0]) * 1.609
+                mph_counts['mph_backward'] += 1
             else:
                 backward = int(tags["maxspeed:backward"])
+                mph_counts['kph_backward'] += 1
         except:
-            pass
+            mph_counts[tags["maxspeed:backward"]] = mph_counts.get(tags["maxspeed:backward"], 0) + 1
 
     return (forward, backward)
 
@@ -232,7 +249,7 @@ def exists(host, port, database, table, user, password):
 
     try:
         cursor.execute(
-            """SELECT COUNT(tablename) FROM pg_tables 
+            """SELECT COUNT(tablename) FROM pg_tables
             WHERE schemaname='public' AND tablename='%s';""" % table)
         dbcon.commit()
     except Exception, e:
@@ -285,7 +302,7 @@ def schema(host, port, database, table, user, password, printonly):
         except:
             print("Connection to database failed.")
             exit(1)
-    
+
         try:
             query = """CREATE TABLE %s(gid bigserial,
     				osm_id bigint NOT NULL,
@@ -306,7 +323,7 @@ def schema(host, port, database, table, user, password, printonly):
                 dbcon.commit()
         except Exception, e:
             print("Database transaction failed. (%s)" % e.pgerror)
-            
+
         try:
             query = "CREATE INDEX idx_%s_geom ON %s USING gist(geom);" % (
                 table, table)
@@ -317,7 +334,7 @@ def schema(host, port, database, table, user, password, printonly):
                 dbcon.commit()
         except Exception, e:
             print("Database transaction failed. (%s)" % e.pgerror)
-    
+
         cursor.close()
         dbcon.close()
 
