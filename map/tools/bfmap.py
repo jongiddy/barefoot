@@ -132,20 +132,15 @@ def is_oneway(tags):
         return False
 
 
-mph_counts = {
-    'mph_forward': 0,
-    'kph_forward': 0,
-    'mph_backward': 0,
-    'kph_backward': 0,
-}
-
-
+mph_counts = {}
 mph_pat = re.compile(r'\s*(\d+)\s*mph')
 
 
 def extract_speed(s):
     limit = 'null'
-    if "mph" in s:
+    if s in ('nsl', 'national'):
+        limit = 70
+    elif "mph" in s:
         parts = s.split(";")
         mph = 0
         for part in parts:
@@ -161,26 +156,22 @@ def extract_speed(s):
             limit = int(s)
         except ValueError:
             pass
+    k = '%s=%s' % (s, limit)
+    mph_counts[k] = mph_counts.get(k, 0) + 1
     return limit
 
 
 def maxspeed(tags):
     forward = "null"
-    backward = "null"
-    if ("maxspeed" in tags.keys()):
+    if ("maxspeed" in tags):
         forward = extract_speed(tags["maxspeed"])
-        mph_counts[tags['maxspeed']] = mph_counts.get(tags['maxspeed'], 0) + 1
-    if ("maxspeed:forward" in tags.keys()):
+    if ("maxspeed:forward" in tags):
         forward = extract_speed(tags["maxspeed:forward"])
-        mph_counts[tags['maxspeed:forward']] = mph_counts.get(
-            tags['maxspeed:forward'], 0) + 1
-    if ("maxspeed" in tags.keys()):
+    backward = "null"
+    if ("maxspeed" in tags):
         backward = extract_speed(tags["maxspeed"])
-        mph_counts[tags['maxspeed']] = mph_counts.get(tags['maxspeed'], 0) + 1
-    if ("maxspeed:backward" in tags.keys()):
+    if ("maxspeed:backward" in tags):
         backward = extract_speed(tags["maxspeed:backward"])
-        mph_counts[tags['maxspeed:backward']] = mph_counts.get(
-            tags['maxspeed:backward'], 0) + 1
     return (forward, backward)
 
 
