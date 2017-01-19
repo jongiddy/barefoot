@@ -103,8 +103,8 @@ class TestBfmap(unittest.TestCase):
     def test_maxspeed(self):
         tags = {"maxspeed": "60 mph"}
         (fwd, bwd) = bfmap.maxspeed(tags)
-        self.assertEquals(60 * 1.609, fwd)
-        self.assertEquals(60 * 1.609, bwd)
+        self.assertEquals(60, fwd)
+        self.assertEquals(60, bwd)
 
         tags = {"maxspeed": "60"}
         (fwd, bwd) = bfmap.maxspeed(tags)
@@ -113,8 +113,8 @@ class TestBfmap(unittest.TestCase):
 
         tags = {"maxspeed:forward": "60 mph", "maxspeed:backward": "60 mph"}
         (fwd, bwd) = bfmap.maxspeed(tags)
-        self.assertEquals(60 * 1.609, fwd)
-        self.assertEquals(60 * 1.609, bwd)
+        self.assertEquals(60, fwd)
+        self.assertEquals(60, bwd)
 
         tags = {"maxspeed:forward": "60", "maxspeed:backward": "60"}
         (fwd, bwd) = bfmap.maxspeed(tags)
@@ -123,8 +123,8 @@ class TestBfmap(unittest.TestCase):
 
         tags = {"maxspeed": "60mph"}
         (fwd, bwd) = bfmap.maxspeed(tags)
-        self.assertEquals("null", fwd)
-        self.assertEquals("null", bwd)
+        self.assertEquals(60, fwd)
+        self.assertEquals(60, bwd)
 
     def test_ways2bfmap(self):
         properties = dict(line.strip().split('=')
