@@ -155,9 +155,7 @@ def maxspeed(tags):
                 forward = int(tags["maxspeed"])
                 mph_counts['kph_forward'] += 1
         except:
-            mph_counts['err_forward'] += 1
-            sys.stderr.write(tags["maxspeed"])
-            traceback.print_exc()
+            mph_counts[tags["maxspeed"]] = mph_counts.get(tags["maxspeed"], 0) + 1
     if ("maxspeed:forward" in tags.keys()):
         try:
             if "mph" in tags["maxspeed:forward"]:
@@ -167,9 +165,7 @@ def maxspeed(tags):
                 forward = int(tags["maxspeed:forward"])
                 mph_counts['kph_forward'] += 1
         except:
-            mph_counts['err_forward'] += 1
-            sys.stderr.write(tags["maxspeed:forward"])
-            traceback.print_exc()
+            mph_counts[tags["maxspeed:forward"]] = mph_counts.get(tags["maxspeed:forward"], 0) + 1
 
     # maxspeed_backward = maxspeed_forward
     backward = "null"
@@ -182,9 +178,7 @@ def maxspeed(tags):
                 backward = int(tags["maxspeed"])
                 mph_counts['kph_backward'] += 1
         except:
-            mph_counts['err_backward'] += 1
-            sys.stderr.write(tags["maxspeed"])
-            traceback.print_exc()
+            mph_counts[tags["maxspeed"]] = mph_counts.get(tags["maxspeed"], 0) + 1
     if ("maxspeed:backward" in tags.keys()):
         try:
             if "mph" in tags["maxspeed:backward"]:
@@ -194,9 +188,7 @@ def maxspeed(tags):
                 backward = int(tags["maxspeed:backward"])
                 mph_counts['kph_backward'] += 1
         except:
-            mph_counts['err_backward'] += 1
-            sys.stderr.write(tags["maxspeed:backward"])
-            traceback.print_exc()
+            mph_counts[tags["maxspeed:backward"]] = mph_counts.get(tags["maxspeed:backward"], 0) + 1
 
     return (forward, backward)
 
