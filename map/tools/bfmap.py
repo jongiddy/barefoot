@@ -22,6 +22,7 @@ import numpy
 import binascii
 import osgeo.ogr as ogr
 import json
+import traceback
 
 # Import OSM (osmosis) to route
 
@@ -154,7 +155,8 @@ def maxspeed(tags):
                 mph_counts['kph_forward'] += 1
         except:
             mph_counts['err_forward'] += 1
-            pass
+            sys.stderr.write(tags["maxspeed"])
+            traceback.print_exc()
     if ("maxspeed:forward" in tags.keys()):
         try:
             if "mph" in tags["maxspeed:forward"]:
@@ -165,7 +167,8 @@ def maxspeed(tags):
                 mph_counts['kph_forward'] += 1
         except:
             mph_counts['err_forward'] += 1
-            pass
+            sys.stderr.write(tags["maxspeed:forward"])
+            traceback.print_exc()
 
     # maxspeed_backward = maxspeed_forward
     backward = "null"
@@ -179,7 +182,8 @@ def maxspeed(tags):
                 mph_counts['kph_backward'] += 1
         except:
             mph_counts['err_backward'] += 1
-            pass
+            sys.stderr.write(tags["maxspeed"])
+            traceback.print_exc()
     if ("maxspeed:backward" in tags.keys()):
         try:
             if "mph" in tags["maxspeed:backward"]:
@@ -190,7 +194,8 @@ def maxspeed(tags):
                 mph_counts['kph_backward'] += 1
         except:
             mph_counts['err_backward'] += 1
-            pass
+            sys.stderr.write(tags["maxspeed:backward"])
+            traceback.print_exc()
 
     return (forward, backward)
 
