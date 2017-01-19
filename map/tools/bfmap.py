@@ -22,6 +22,7 @@ import numpy
 import binascii
 import osgeo.ogr as ogr
 import json
+import re
 
 # Import OSM (osmosis) to route
 
@@ -139,54 +140,49 @@ mph_counts = {
 }
 
 
-def maxspeed(tags):
-    # maxspeed_forward = int(config[key][value][2])
-    forward = "null"
-    if ("maxspeed" in tags.keys()):
-        try:
-            if "mph" in tags["maxspeed"]:
-                forward = int(tags["maxspeed"].split(" ")[0]) * 1.609
-                mph_counts['mph_forward'] += 1
-            else:
-                forward = int(tags["maxspeed"])
-                mph_counts['kph_forward'] += 1
-        except:
-            mph_counts[tags["maxspeed"]] = mph_counts.get(tags["maxspeed"], 0) + 1
-    if ("maxspeed:forward" in tags.keys()):
-        try:
-            if "mph" in tags["maxspeed:forward"]:
-                forward = int(tags["maxspeed:forward"].split(" ")[0]) * 1.609
-                mph_counts['mph_forward'] += 1
-            else:
-                forward = int(tags["maxspeed:forward"])
-                mph_counts['kph_forward'] += 1
-        except:
-            mph_counts[tags["maxspeed:forward"]] = mph_counts.get(tags["maxspeed:forward"], 0) + 1
+mph_pat = re.compile(r'\s*(\d+)\s*mph')
 
-    # maxspeed_backward = maxspeed_forward
+
+def extract_speed(s):
+    limit = 'null'
+    if "mph" in s:
+        parts = s.split(";")
+        mph = 0
+        for part in parts:
+            match = mph_pat.match(part).group(1)
+            if match is None:
+                raise RuntimeError(s)
+            speed = int(match)
+            if speed > mph:
+                mph = speed
+        limit = mph
+    else:
+        try:
+            limit = int(s)
+        except ValueError:
+            pass
+    return limit
+
+
+def maxspeed(tags):
+    forward = "null"
     backward = "null"
     if ("maxspeed" in tags.keys()):
-        try:
-            if "mph" in tags["maxspeed"]:
-                backward = int(tags["maxspeed"].split(" ")[0]) * 1.609
-                mph_counts['mph_backward'] += 1
-            else:
-                backward = int(tags["maxspeed"])
-                mph_counts['kph_backward'] += 1
-        except:
-            mph_counts[tags["maxspeed"]] = mph_counts.get(tags["maxspeed"], 0) + 1
+        forward = extract_speed(tags["maxspeed"])
+        mph_counts[tags['maxspeed']] = mph_counts.get(tags['maxspeed'], 0) + 1
+    if ("maxspeed:forward" in tags.keys()):
+        forward = extract_speed(tags["maxspeed:forward"])
+        mph_counts[tags['maxspeed:forward']] = mph_counts.get(
+            tags['maxspeed:forward'], 0) + 1
+    if ("maxspeed" in tags.keys()):
+        backward = extract_speed(tags["maxspeed"])
+        mph_counts[tags['maxspeed']] = mph_counts.get(tags['maxspeed'], 0) + 1
     if ("maxspeed:backward" in tags.keys()):
-        try:
-            if "mph" in tags["maxspeed:backward"]:
-                backward = int(tags["maxspeed:backward"].split(" ")[0]) * 1.609
-                mph_counts['mph_backward'] += 1
-            else:
-                backward = int(tags["maxspeed:backward"])
-                mph_counts['kph_backward'] += 1
-        except:
-            mph_counts[tags["maxspeed:backward"]] = mph_counts.get(tags["maxspeed:backward"], 0) + 1
-
+        backward = extract_speed(tags["maxspeed:backward"])
+        mph_counts[tags['maxspeed:backward']] = mph_counts.get(
+            tags['maxspeed:backward'], 0) + 1
     return (forward, backward)
+
 
 def segment(config, row):
     segments = []
@@ -197,7 +193,7 @@ def segment(config, row):
     (tags, way) = waysort(row)
     (key, value) = type(config, tags)
 
-    if key == None or value == None:
+    if key is None or value is None:
         return segments
 
     osm_id = row[0]
