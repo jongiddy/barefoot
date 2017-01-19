@@ -22,6 +22,7 @@ import numpy
 import binascii
 import osgeo.ogr as ogr
 import json
+import sys
 import traceback
 
 # Import OSM (osmosis) to route
