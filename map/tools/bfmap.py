@@ -147,7 +147,7 @@ def extract_speed(s):
         for part in parts:
             match = mph_pat.match(part)
             if match is None:
-                sys.stderr.write('Unrecognised speed limit: {!r}'.format(s))
+                sys.stderr.write('Unrecognised speed limit: {!r}\n'.format(s))
                 return 70
             speed = int(match.group(1))
             if speed > mph:
