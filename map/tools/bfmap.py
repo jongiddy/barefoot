@@ -144,10 +144,10 @@ def extract_speed(s):
         parts = s.split(";")
         mph = 0
         for part in parts:
-            match = mph_pat.match(part).group(1)
+            match = mph_pat.match(part)
             if match is None:
                 raise RuntimeError(s)
-            speed = int(match)
+            speed = int(match.group(1))
             if speed > mph:
                 mph = speed
         limit = mph
