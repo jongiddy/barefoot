@@ -23,6 +23,7 @@ import binascii
 import osgeo.ogr as ogr
 import json
 import re
+import sys
 
 # Import OSM (osmosis) to route
 
@@ -146,7 +147,8 @@ def extract_speed(s):
         for part in parts:
             match = mph_pat.match(part)
             if match is None:
-                raise RuntimeError(s)
+                sys.stderr.write('Unrecognised speed limit: {!r}'.format(s))
+                return 70
             speed = int(match.group(1))
             if speed > mph:
                 mph = speed
