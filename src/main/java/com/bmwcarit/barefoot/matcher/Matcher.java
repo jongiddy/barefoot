@@ -329,7 +329,7 @@ public class Matcher extends Filter<MatcherCandidate, MatcherTransition, Matcher
         Collections.sort(samples, new Comparator<MatcherSample>() {
             @Override
             public int compare(MatcherSample left, MatcherSample right) {
-                return (int) (left.time() - right.time());
+                return Long.signum(left.time() - right.time());
             }
         });
 
